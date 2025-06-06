@@ -1,108 +1,130 @@
 let player;
-let objects = [];
-let score = 0;
-let gameOver = false;
+let fruits = [];
+let money = 0;
+let isInCity = false;
 
 function setup() {
-  createCanvas(600, 400);
+  createCanvas(800, 600);
   player = new Player();
-  noStroke();
+
+  // Criando 5 frutas no campo
+  for (let i = 0; i < 5; i++) {
+    fruits.push(new Fruit(random(100, 300), random(100, 400)));
+  }
 }
 
 function draw() {
-  background(220);
+  background(200);
 
-  if (gameOver) {
-    textSize(32);
-    textAlign(CENTER, CENTER);
-    fill(0);
-    text("FIM DE JOGO", width / 2, height / 2);
-    textSize(24);
-    text("Pontos: " + score, width / 2, height / 2 + 40);
-    return;
+  if (isInCity) {
+    drawCity();
+  } else {
+    drawField();
   }
 
-  player.update();
+  // Mostrar o personagem
   player.show();
+  player.move();
 
-  
-  if (frameCount % 60 === 0) {
-    let obj = new FallingObject();
-    objects.push(obj);
+  // Mostrar as frutas
+  for (let i = 0; i < fruits.length; i++) {
+    fruits[i].show();
   }
 
-  
-  for (let i = objects.length - 1; i >= 0; i--) {
-    objects[i].update();
-    objects[i].show();
+  // Mostrar o dinheiro
+  displayMoney();
+}
 
-    
-    if (objects[i].captured(player)) {
-      objects.splice(i, 1);
-      score++;
-    }
-
-    
-    if (objects[i].y > height) {
-      gameOver = true;
-    }
+function keyPressed() {
+  if (keyCode === 67) { // 'C' para mudar entre campo e cidade
+    isInCity = !isInCity;
   }
 
-  
+  if (keyCode === 32) { // 'Espaço' para pegar fruta
+    if (!isInCity) {
+      for (let i = fruits.length - 1; i >= 0; i--) {
+        let fruit = fruits[i];
+        if (player.intersects(fruit)) {
+          fruits.splice(i, 1); // Remove a fruta do campo
+        }
+      }
+    } else {
+      // Vende frutas na cidade
+      let fruitsCollected = 5 - fruits.length; // Quantas frutas foram coletadas
+      money += fruitsCollected * 10; // Cada fruta vale 10 moedas
+      fruits = []; // Esvazia as frutas após a venda
+    }
+  }
+}
+
+function drawField() {
+  fill(0, 255, 0);
+  rect(0, 0, width, height); // Campo (verde)
+
   fill(0);
-  textSize(16);
-  text("Pontos: " + score, 10, 20);
+  textSize(24);
+  text("Campo: Colete frutas", 50, 50);
+}
+
+function drawCity() {
+  fill(150, 150, 150);
+  rect(0, 0, width, height); // Cidade (cinza)
+
+  fill(0);
+  textSize(24);
+  text("Cidade: Venda frutas", 50, 50);
+}
+
+function displayMoney() {
+  fill(0);
+  textSize(20);
+  text("Dinheiro: " + money + " moedas", 600, 50);
 }
 
 class Player {
   constructor() {
-    this.x = width / 2;
-    this.y = height - 30;
-    this.size = 40;
+    this.x = 50;
+    this.y = height / 2;
+    this.size = 30;
     this.speed = 5;
   }
 
-  update() {
+  show() {
+    fill(255, 0, 0);
+    rect(this.x, this.y, this.size, this.size);
+  }
+
+  move() {
     if (keyIsDown(LEFT_ARROW)) {
       this.x -= this.speed;
     }
     if (keyIsDown(RIGHT_ARROW)) {
       this.x += this.speed;
     }
-
-    this.x = constrain(this.x, 0, width - this.size);
+    if (keyIsDown(UP_ARROW)) {
+      this.y -= this.speed;
+    }
+    if (keyIsDown(DOWN_ARROW)) {
+      this.y += this.speed;
+    }
   }
 
-  show() {
-    fill(0, 150, 255);
-    rect(this.x, this.y, this.size, this.size);
+  intersects(fruit) {
+    let d = dist(this.x, this.y, fruit.x, fruit.y);
+    return d < this.size / 2 + fruit.size / 2;
   }
 }
 
-class FallingObject {
-  constructor() {
-    this.x = random(width);
-    this.y = 0;
-    this.size = 20;
-    this.speed = 4;
-  }
-
-  update() {
-    this.y += this.speed;
+class Fruit {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.size = 30;
   }
 
   show() {
-    fill(255, 0, 0);
-    ellipse(this.x, this.y, this.size, this.size);
-  }
-
-  captured(player) {
-    return (
-      player.x < this.x + this.size / 2 &&
-      player.x + player.size > this.x - this.size / 2 &&
-      player.y < this.y + this.size / 2 &&
-      player.y + player.size > this.y - this.size / 2
-    );
+    fill(255, 165, 0);
+    ellipse(this.x, this.y, this.size);
   }
 }
 
