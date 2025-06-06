@@ -2,6 +2,7 @@ let player;
 let fruits = [];
 let money = 0;
 let isInCity = false;
+let showInstructions = true;
 
 function setup() {
   createCanvas(800, 600);
@@ -16,23 +17,28 @@ function setup() {
 function draw() {
   background(200);
 
-  if (isInCity) {
-    drawCity();
+  // Mostrar o texto de instruções no início
+  if (showInstructions) {
+    displayInstructions();
   } else {
-    drawField();
+    if (isInCity) {
+      drawCity();
+    } else {
+      drawField();
+    }
+
+    // Mostrar o personagem
+    player.show();
+    player.move();
+
+    // Mostrar as frutas
+    for (let i = 0; i < fruits.length; i++) {
+      fruits[i].show();
+    }
+
+    // Mostrar o dinheiro
+    displayMoney();
   }
-
-  // Mostrar o personagem
-  player.show();
-  player.move();
-
-  // Mostrar as frutas
-  for (let i = 0; i < fruits.length; i++) {
-    fruits[i].show();
-  }
-
-  // Mostrar o dinheiro
-  displayMoney();
 }
 
 function keyPressed() {
@@ -81,6 +87,23 @@ function displayMoney() {
   text("Dinheiro: " + money + " moedas", 600, 50);
 }
 
+function displayInstructions() {
+  fill(0);
+  textSize(30);
+  textAlign(CENTER);
+  text("Como Jogar:", width / 2, height / 2 - 100);
+  textSize(20);
+  text("Use as setas para mover o quadrado vermelho.", width / 2, height / 2 - 40);
+  text("Colete frutas no campo e pressione 'C' para ir até a cidade.", width / 2, height / 2);
+  text("Na cidade, pressione 'Espaço' para vender as frutas e ganhar dinheiro.", width / 2, height / 2 + 40);
+  text("Boa sorte!", width / 2, height / 2 + 80);
+
+  // Esconde as instruções após 5 segundos
+  setTimeout(() => {
+    showInstructions = false;
+  }, 5000); // 5000 milissegundos = 5 segundos
+}
+
 class Player {
   constructor() {
     this.x = 50;
@@ -127,8 +150,3 @@ class Fruit {
     ellipse(this.x, this.y, this.size);
   }
 }
-
-
-
-
-
