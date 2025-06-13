@@ -94,7 +94,7 @@ function displayInstructions() {
   text("Como Jogar:", width / 2, height / 2 - 100);
   textSize(20);
   text("Use as setas para mover o quadrado vermelho.", width / 2, height / 2 - 40);
-  text("Colete frutas no campo e pressione 'C' para ir até a cidade.", width / 2, height / 2);
+  text("Colete frutas no campo pressionando a barra de espaço e pressione 'C' para ir até a cidade.", width / 2, height / 2);
   text("Na cidade, pressione 'Espaço' para vender as frutas e ganhar dinheiro.", width / 2, height / 2 + 40);
   text("Boa sorte!", width / 2, height / 2 + 80);
 
